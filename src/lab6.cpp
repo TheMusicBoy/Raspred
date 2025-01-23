@@ -25,18 +25,18 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &thread);
 
     std::mt19937 mt(std::time(nullptr));
-    constexpr size_t size = 100;
+    constexpr size_t size = 1000;
     std::vector<std::vector<int>> A(size, std::vector<int>(size));
     std::vector<std::vector<int>> B(size, std::vector<int>(size));
     for (auto& l : A) {
         for (auto& e : l) {
-            e = mt();
+            e = mt() % 10;
         }
     }
 
     for (auto& l : B) {
         for (auto& e : l) {
-            e = mt();
+            e = mt() % 10;
         }
     }
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
         for (int i = 0; i < size; i++) {
             for (int r = 0; r < size; r++) {
                 for (int ii = 0; ii < size; ii++) {
-                    C[i][r] += A[i][ii] * B[ii][r];
+                    C[i][r] += A[i][ii] * B[r][ii];
                 }
             }
         }
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
         for (int r = 0; r < size; r++) {
             int sum = 0;
             MPI_Scatter(A[i].data(), chunkSize, MPI_INT, bufferA.data(), chunkSize, MPI_INT, 0, MPI_COMM_WORLD);
-            MPI_Scatter(B[i].data(), chunkSize, MPI_INT, bufferB.data(), chunkSize, MPI_INT, 0, MPI_COMM_WORLD);
+            MPI_Scatter(B[r].data(), chunkSize, MPI_INT, bufferB.data(), chunkSize, MPI_INT, 0, MPI_COMM_WORLD);
             for (int ii = 0; ii < chunkSize; ii++) {
                 sum += bufferA[ii] * bufferB[ii];
             }
