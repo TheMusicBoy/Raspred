@@ -1,0 +1,29 @@
+#include <iostream>
+#include <mpi_helper/helper.h>
+
+#include <thread>
+#include <chrono>
+#include <algorithm>
+
+int main(int argc, char** argv) {
+    NMpi::TMpiHelper mpi(argc, argv);
+
+    if (mpi.GetCurrentThread() == 0) {
+        
+        for (int i = 1; i < mpi.GetThreadCount(); i++) {
+            std::pair<int, int> data = {1, 1};
+            // std::vector<std::string> mas = {"1"};
+            // for (int r = 2; r < 10; r++) {
+            //     mas.push_back(mas.back() + ' ' + std::to_string(r));
+            // }
+            
+        }
+        std::cout << "0 sent message for all!" << std::endl;
+    } else {
+        std::map<int, int> mas = mpi.Recieve<std::map<int, int>>(0);
+
+        for (const auto& [key, value] : mas) {
+            std::cout << key << ' ' << value << std::endl;
+        }
+    }
+}
